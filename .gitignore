@@ -1,61 +1,44 @@
-
-# Created by https://www.toptal.com/developers/gitignore/api/qt
-# Edit at https://www.toptal.com/developers/gitignore?templates=qt
-
-### Qt ###
-# C++ objects and libs
-*.slo
-*.lo
+# Qt build directories and cache files
+build*/
+*/build/
 *.o
-*.a
-*.la
-*.lai
-*.so
-*.so.*
-*.dll
-*.dylib
-
-# Qt-es
-object_script.*.Release
-object_script.*.Debug
-*_plugin_import.cpp
-/.qmake.cache
-/.qmake.stash
-*.pro.user
-*.pro.user.*
-*.qbs.user
-*.qbs.user.*
+*.obj
 *.moc
-moc_*.cpp
-moc_*.h
-qrc_*.cpp
-ui_*.h
-*.qmlc
-*.jsc
-Makefile*
-*build-*
-*.qm
-*.prl
-
-# Qt unit tests
-target_wrapper.*
-
-# QtCreator
-*.autosave
-
-# QtCreator Qml
+*.qrc
+*.qmake.stash
+*.qmake.cache
+*.pro.user
 *.qmlproject.user
-*.qmlproject.user.*
+*.creator.user
+*.qbs.user
+*.qtc_clangd/
+*.idx
+*.pro
 
-# QtCreator CMake
-CMakeLists.txt.user*
 
-# QtCreator 4.8< compilation database
-compile_commands.json
 
-# QtCreator local machine specific files for imported projects
-*creator.user*
+# MSVC and GCC build files
+*.exe
+*.ilk
+*.pdb
+*.vc.pdb
+*.ipdb
+*.iobj
 
-*_qmlcache.qrc
+# Windows specific files
+Thumbs.db
+desktop.ini
 
-# End of https://www.toptal.com/developers/gitignore/api/qt
+# MacOS specific files
+.DS_Store
+
+# IDE and Editor specific files
+.idea/
+.vscode/
+*.code-workspace
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+*.swp
