@@ -15,6 +15,8 @@ Widget::Widget(QWidget *parent)
     tabWidget->addTab(dial, "Tab &1");
     tabWidget->addTab(calendarWidget, "Tab &2");
     tabWidget->addTab(textEdit, "Tab &3");
+    tabWidget->setTabShape(QTabWidget::Triangular);
+    tabWidget->setTabPosition (QTabWidget::West);
 
     resize(tabWidget->sizeHint());
 }
