@@ -17,6 +17,8 @@ Widget::Widget(QWidget *parent)
     splitter->addWidget(dial2);
 
     resize(splitter->sizeHint());
+
+    //commit용 변경
 }
 
 Widget::~Widget() {}
