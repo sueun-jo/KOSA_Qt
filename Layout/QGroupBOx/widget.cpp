@@ -15,7 +15,7 @@ Widget::Widget(QWidget *parent)
         formLayout -> addRow(labels.at(i), lineEdit[i]);
     }
 
-    QGroupBox *groupBox = new QGroupBox ("&name Group", this);
+    QGroupBox *groupBox = new QGroupBox ("&Widget Group", this);
     groupBox-> move(5, 5);
     groupBox-> setLayout(formLayout);
 
