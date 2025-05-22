@@ -30,7 +30,7 @@ private:
 
 public slots:
     /* File Menu */
-    void newFile( );
+    QTextEdit* newFile( );
     void openFile( );
     void saveFile( );
     void saveAsFile( );

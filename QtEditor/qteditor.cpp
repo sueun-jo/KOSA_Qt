@@ -222,7 +222,7 @@ QtEditor::~QtEditor()
 {
 }
 
-void QtEditor::newFile( )
+QTextEdit* QtEditor::newFile( )
 {
     statusBar()->showMessage("Make New File");
     QTextEdit *textedit = new QTextEdit;
@@ -241,16 +241,59 @@ void QtEditor::newFile( )
 
 void QtEditor::openFile( )
 {
-    statusBar()->showMessage("Open a File");
-    QString filename = QFileDialog::getOpenFileName(this, "Select file to open",                                                   ".", "Text File (*.txt *.html *.c *.cpp *.h)");
-    if(filename.length()) qDebug( ) << filename;
+    qDebug("Open a File");
+    QString filename = QFileDialog::getOpenFileName(this, "Select file to open", ".", "Text File (*.txt *.html *.c *.cpp *.h)");
+    if(!filename.length()) return;
+
+    QFileInfo fileInfo(filename); //파일 읽을 수 있는지 검사
+    if (fileInfo.isReadable()){
+        QFile file(filename); //파일을 읽기 모드로 읽기
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        QByteArray msg = file.readAll(); //파일 읽기
+        file.close();
+
+        QTextEdit *textedit = newFile(); //새로운 창 생성
+        textedit->setWindowTitle(filename); //save기능을 위해 경로 저장
+
+        windowHash.key(textedit)->setText(filename); //QAction의 text변경
+
+        if (fileInfo.suffix() =="html" || fileInfo.suffix()== "html")
+            textedit->setHtml(msg);
+        else textedit-> setPlainText(msg);
+    }
+
+    else
+        QMessageBox::warning(this, "Error", "Can't Read this file", QMessageBox::Ok);
 }
 
+//파일을 기존 이름으로 저장한다
 void QtEditor::saveFile( )
 {
-    statusBar()->showMessage("Save this File");
-    QString filename = QFileDialog::getSaveFileName(this, "Select file to save",                                                   ".", "Text File (*.txt *.html *.c *.cpp *.h)");
-    if(filename.length()) qDebug( ) << filename;
+    qDebug("Save a File");
+    QMdiSubWindow* window = mdiArea->currentSubWindow();
+    if (window != nullptr){
+        QTextEdit* textedit = qobject_cast<QTextEdit*>(window->widget());
+        QString filename = textedit->windowTitle();
+        if (!filename.length()){
+            filename = QFileDialog::getSaveFileName(this, "Select a file to save", ".", "Text File (*.txt *.html *.c *.cpp *.h)");
+
+            if(!filename.length()) return;
+            textedit->setWindowTitle(filename);
+            windowHash.key(textedit)->setText(filename);
+        }
+
+        QFile file(filename); //파일 객체 생성
+        file.open(QIODevice::WriteOnly | QIODevice::Text); //파일을 문자 모드로 열기
+        QFileInfo fileInfo(filename);
+
+        if(fileInfo.isWritable()){
+            //QString을 QByteArray로
+            QByteArray msg = (fileInfo.suffix() =="html" || fileInfo.suffix()== "html")?
+                                 textedit->toHtml().toUtrf8() : textedit->toPlainText().toUtf8();
+            file.write(msg); //파일 저장
+        }
+    } else
+        QMessageBox::Warning(this, "Error", "Can't ")
 }
 
 void QtEditor::saveAsFile( )
