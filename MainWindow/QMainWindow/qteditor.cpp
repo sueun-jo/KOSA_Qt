@@ -1,11 +1,9 @@
-#include "qteditor.h"
 #include <QTextEdit>
 #include <QMenuBar>
 #include <QMenu>
 #include <QAction>
 #include <QKeySequence>
 #include <QApplication>
-#include <QIcon>
 #include <QToolBar>
 #include <QFontComboBox>
 #include <QDoubleSpinBox>
@@ -14,6 +12,7 @@
 #include <QDockWidget>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include "qteditor.h"
 
 QtEditor::QtEditor(QWidget *parent)
     : QMainWindow(parent)
@@ -23,8 +22,8 @@ QtEditor::QtEditor(QWidget *parent)
 
 #if 0 //edit메뉴를 수정한 후 0으로 변경
     QTextEdit *testedit = new QtextEdit(this);
+    //setCentralWidget(mdiArea);
     mdiArea->addSubWindow(textedit);
-
 #else
     QTextEdit *textedit = newFile(); //생성자의 제일 마지막으로 이동
 #endif
@@ -37,8 +36,6 @@ QtEditor::QtEditor(QWidget *parent)
     addDockWidget(Qt::RightDockWidgetArea, dock);
     dock->setWidget(w);
 
-    textedit = new QTextEdit(this);
-    setCentralWidget(textedit);
     QMenuBar *menubar = new QMenuBar(this);
     setMenuBar(menubar);
 
@@ -55,6 +52,7 @@ QtEditor::QtEditor(QWidget *parent)
                                   tr("Quit this program"), qApp, SLOT(quit()));
 
     QMenu *fileMenu = menubar->addMenu("&File"); //FileMenu추가
+
     /*filemenu 내에 있는 애들*/
     fileMenu->addAction(newAct);
     fileMenu->addAction(openAct);
@@ -91,18 +89,29 @@ QtEditor::QtEditor(QWidget *parent)
     editMenu->addAction(zoomOutAct);
 
     /*Format메뉴에 QAction들*/
-    QAction *alignCenterAct = makeAction("centeralign", tr("&Center"), QKeySequence(),
-                                         tr(":/images/centeralign.png"), this, SLOT(alignText()));
-    QAction *alignLeftAct = makeAction("leftalign", tr("&Left"), QKeySequence(),
-                                       tr(":/images/leftalign"), this, SLOT(alignText()));
+    QAction *alignCenterAct = makeAction(":/images/centeralign", tr("&Center"), QKeySequence(),
+                                         tr("AlignCenter"), this, SLOT(alignText()));
+    QAction *alignLeftAct = makeAction(":/images/leftalign", tr("&Left"), QKeySequence(),
+                                       tr("Align Left"), this, SLOT(alignText()));
     QAction *alignRightAct = makeAction(":/images/rightalign", tr("&Right"), QKeySequence(), tr("Align Right"),
                                         this, SLOT(alignText()));
-    /*Format메뉴를 추가할게용*/
+    /* Format */
     QMenu *formatMenu = menubar->addMenu("&Format");
     QMenu *alignMenu= formatMenu->addMenu("&Align");
     alignMenu->addAction(alignCenterAct); // Format -> Aling -> center
     alignMenu->addAction(alignLeftAct); //alignleft
     alignMenu->addAction(alignRightAct); //alignright
+
+    /*Window 메뉴*/
+
+    QAction *cascadeAct = makeAction("cascadeimageurl", tr("&Cascade"), QKeySequence(),
+                                     tr("cascade"), mdiArea, SLOT(cascadeSubWindows()));
+    QAction *tileAct = makeAction("tileimageurl", tr("&Tile"), QKeySequence(),
+                                     tr("tile"), mdiArea, SLOT(tileSubWindows()));
+    QMenu *windowMenu = menubar->addMenu("&Window"); //window메뉴 추가한거임
+    windowMenu->addAction(cascadeAct);
+    windowMenu->addAction(tileAct);
+
 
 
     /*Status Bar*/
@@ -122,15 +131,15 @@ QtEditor::QtEditor(QWidget *parent)
     fileToolBar->addSeparator();
     fileToolBar->addAction(quitAct);
 
-    QMenu *windowMenu = menubar->addMenu("&Window");
+
     QMenu *toolbarMenu = windowMenu->addMenu("&Toolbar");
     toolbarMenu->addAction(fileToolBar->toggleViewAction());
     toolbarMenu -> addAction(dock->toggleViewAction());  /*QDockWidget tollbarMenu*/
 
-    QFontComboBox *fontComboBox = new QFontComboBox(this);
-    connect(fontComboBox, SIGNAL(currentFontChanged(QFont)), textedit, SLOT(setCurrentFont(QFont)));
-    QDoubleSpinBox *sizeSpinBox = new QDoubleSpinBox(this);
-    connect(sizeSpinBox, SIGNAL(valueChanged(double)), textedit, SLOT(setFontPointSize(qreal)));
+    fontComboBox = new QFontComboBox(this);
+    connect(fontComboBox, SIGNAL(currentFontChanged(QFont)), SLOT(setTextFont(QFont)));
+    sizeSpinBox = new QDoubleSpinBox(this);
+    connect(sizeSpinBox, SIGNAL(valueChanged(double)), SLOT(setTextSize(qreal)));
 
     addToolBarBreak(); //다음툴바 아랫줄 위치
 
@@ -168,9 +177,6 @@ QAction *QtEditor::makeAction(QString icon, QString text, T shortCut,
 }
 
 
-// void QtEditor::newFile(){
-//     qDebug("Make New File");
-// }
 
 void QtEditor::open(){
     qDebug("Open a file");
@@ -212,12 +218,14 @@ void QtEditor::alignText(){
 
     QAction *action = qobject_cast<QAction*>(sender());
     QMdiSubWindow *subWindow = mdiArea->currentSubWindow();
+    if (subWindow != nullptr){
     QTextEdit *textedit = dynamic_cast<QTextEdit*>(subWindow->widget());
     if(action->text().contains("Left", Qt::CaseInsensitive))
         textedit->setAlignment(Qt::AlignLeft);
     else if(action->text().contains("Center", Qt::CaseInsensitive))
         textedit->setAlignment(Qt::AlignCenter);
-      else if(action->text().contains("Right", Qt::CaseInsensitive))
+    else if(action->text().contains("Right", Qt::CaseInsensitive))
         textedit->setAlignment(Qt::AlignRight);
+    }
 }
 

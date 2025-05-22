@@ -6,6 +6,8 @@ class QLabel;
 class QAction;
 class QMdiArea;
 class QTextEdit;
+class QFontComboBox;
+class QDoubleSpinBox;
 
 class QtEditor : public QMainWindow
 {
@@ -26,6 +28,8 @@ private:
                         QString toolTip, QObject* recv, Functor lambda);
 
     QMdiArea *mdiArea;
+    QFontComboBox *fontComboBox;
+    QDoubleSpinBox *sizeSpinBox;
 
 
 public slots:
@@ -38,8 +42,6 @@ public slots:
 
     void alignText();
 };
-
-
 
 
 #endif // QTEDITOR_H
