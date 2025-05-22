@@ -12,6 +12,11 @@
 #include <QDockWidget>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QDebug>
+#include <QColorDialog>
+
 #include "qteditor.h"
 
 QtEditor::QtEditor(QWidget *parent)
@@ -95,12 +100,20 @@ QtEditor::QtEditor(QWidget *parent)
                                        tr("Align Left"), this, SLOT(alignText()));
     QAction *alignRightAct = makeAction(":/images/rightalign", tr("&Right"), QKeySequence(), tr("Align Right"),
                                         this, SLOT(alignText()));
+
+    QAction *colorAct = makeAction(":/images/color.png", tr("Set Color"), QKeySequence(),
+                                   tr("Set text color"), this, [=]() {
+                                       setColor();  // 여기서 리턴값은 안 써도 괜찮음
+                                   });
     /* Format */
     QMenu *formatMenu = menubar->addMenu("&Format");
     QMenu *alignMenu= formatMenu->addMenu("&Align");
+    QMenu *colorMenu = formatMenu->addMenu("&Color");
+
     alignMenu->addAction(alignCenterAct); // Format -> Aling -> center
     alignMenu->addAction(alignLeftAct); //alignleft
     alignMenu->addAction(alignRightAct); //alignright
+    colorMenu->addAction(colorAct);
 
     /*Window 메뉴*/
 
@@ -112,7 +125,12 @@ QtEditor::QtEditor(QWidget *parent)
     windowMenu->addAction(cascadeAct);
     windowMenu->addAction(tileAct);
 
+    /* Help menu */
+    QMenu *helpMenu = menubar->addMenu("&Help");
+    QMenu *aboutMenu = helpMenu->addMenu("&About");
 
+    QAction *aboutAct = makeAction("", tr("About Qt"), QKeySequence(), tr("Show About Qt"), this, SLOT(aboutProgram()));
+    aboutMenu->addAction(aboutAct);
 
     /*Status Bar*/
     QStatusBar *statusbar = statusBar();
@@ -172,7 +190,7 @@ QAction *QtEditor::makeAction(QString icon, QString text, T shortCut,
     if(icon.length()) act->setIcon(QIcon(icon));
     QKeySequence keySequence(shortCut);
     act->setStatusTip(toolTip);
-    connect(act, SIGNAL(triggered()), this, lambda);
+    connect(act, &QAction::triggered, this, lambda);
     return act;
 }
 
@@ -194,6 +212,10 @@ void QtEditor::quit(){
     qDebug("quit");
 }
 
+void QtEditor::aboutProgram(){
+    QMessageBox::about(this, "About Program",
+                       "This is a Qt Text Editor made by Sueun.\nVersion 1.0\nPowered by Qt.");
+}
 
 QTextEdit *QtEditor::newFile(){
     qDebug("Make New File");
@@ -229,3 +251,31 @@ void QtEditor::alignText(){
     }
 }
 
+// void QtEditor::setTextSize(qreal size){
+//     QTextEdit *
+// }
+
+void QtEditor::openFile(){
+    QString filename = QFileDialog::getOpenFileName(this, "Select file to open",
+                                                    QDir::home().dirName(), "Text File(*.txt *.html *.c *.cpp *.h)");
+    qDebug() << filename;
+}
+
+void QtEditor::saveFile(){
+    QString filename = QFileDialog::getSaveFileName(this, "Select file to save",
+                                                    ".", "Text File(*.txt *.html *.c *.cpp *.h)");
+    qDebug() << filename;
+}
+
+
+void QtEditor::saveAsFile(){
+    QString filename = QFileDialog::getSaveFileName(this, "Select file to save as",
+                                                    ".", "Text File(*.txt *.html *.c *.cpp *.h)");
+    qDebug() << filename;
+}
+
+void QtEditor::setColor(){
+    QTextEdit *textedit = (QTextEdit*)mdiArea->currentSubWindow()->widget();
+    QColor color = QColorDialog::getColor(textedit->textColor(), this);
+    if(color.isValid()) textedit->setTextColor(color);
+}

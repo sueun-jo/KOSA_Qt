@@ -34,6 +34,7 @@ private:
 
 public slots:
     QTextEdit *newFile();
+
     // void newFile();
     void open();
     void save();
@@ -41,6 +42,16 @@ public slots:
     void quit();
 
     void alignText();
+
+    void aboutProgram();
+    void openFile();
+    void saveFile();
+    void saveAsFile();
+
+    void setColor();
+
+
+
 };
 
 
