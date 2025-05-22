@@ -11,25 +11,47 @@
 #include <QDoubleSpinBox>
 #include <QLabel>
 #include <QStatusBar>
+#include <QDockWidget>
+#include <QMdiArea>
+#include <QMdiSubWindow>
 
 QtEditor::QtEditor(QWidget *parent)
     : QMainWindow(parent)
 {
+    mdiArea = new QMdiArea(this);
+    setCentralWidget(mdiArea);
+
+#if 0 //edit메뉴를 수정한 후 0으로 변경
+    QTextEdit *testedit = new QtextEdit(this);
+    mdiArea->addSubWindow(textedit);
+
+#else
+    QTextEdit *textedit = newFile(); //생성자의 제일 마지막으로 이동
+#endif
+
+    /*QDockWidget*/
+    QWidget *w = new QWidget(this);
+    QLabel *label = new QLabel ("Dock Widget", w);
+    QDockWidget *dock = new QDockWidget ("Dock Widget", this);
+    dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, dock);
+    dock->setWidget(w);
+
     textedit = new QTextEdit(this);
     setCentralWidget(textedit);
     QMenuBar *menubar = new QMenuBar(this);
     setMenuBar(menubar);
 
     /*filemenu 그룹*/
-    QAction *newAct = makeAction ("new.png", tr("&New"), QKeySequence::New,
+    QAction *newAct = makeAction (":/images/new.png", tr("&New"), QKeySequence::New,
                                  tr("make new file"), this, SLOT(newFile()));
-    QAction *openAct = makeAction("open.png", tr("&Open"), QKeySequence::Open,
+    QAction *openAct = makeAction(":/images/open.png", tr("&Open"), QKeySequence::Open,
                                   tr("open a file"), this, SLOT(open()));
-    QAction *saveAct = makeAction("save.png", tr("&Save"), tr("Ctrl+S"),
+    QAction *saveAct = makeAction(":/images/save.png", tr("&Save"), tr("Ctrl+S"),
                                   tr("save a file"), this, SLOT(save()));
-    QAction *saveAsAct = makeAction("saveAs.png", tr("&Save As"), QKeySequence::SaveAs,
+    QAction *saveAsAct = makeAction(":/images/saveAs.png", tr("&Save As"), QKeySequence::SaveAs,
                                   tr("save as a file"), this, SLOT(saveAs()));
-    QAction *quitAct = makeAction ("quit.png", tr("&Quit"), tr("Ctrl+Q"),
+    QAction *quitAct = makeAction (":/images/quit.png", tr("&Quit"), tr("Ctrl+Q"),
                                   tr("Quit this program"), qApp, SLOT(quit()));
 
     QMenu *fileMenu = menubar->addMenu("&File"); //FileMenu추가
@@ -41,20 +63,20 @@ QtEditor::QtEditor(QWidget *parent)
     fileMenu->addAction(quitAct);
 
     /*edit menu group aciton*/
-    QAction *undoAct = makeAction("undo.png", tr("&Undo"), QKeySequence::Undo,
+    QAction *undoAct = makeAction(":/images/undo.png", tr("&Undo"), QKeySequence::Undo,
                                   tr("Undo"), textedit, SLOT(undo()));
-    QAction *redoAct = makeAction("redo.png", tr("&Redo"), QKeySequence::Redo,
+    QAction *redoAct = makeAction(":/images/redo.png", tr("&Redo"), QKeySequence::Redo,
                                   tr("Redo"), textedit, SLOT(redo()));
     QAction *copyAct = makeAction("copy.png", tr("&Copy"), tr("Ctrl+C"),
-                                  tr("Copy"), textedit, SLOT(copy()));
+                                  tr(":/images/copy"), textedit, SLOT(copy()));
     QAction *cutAct = makeAction("cut.png", tr("&Cut"), QKeySequence::Cut,
-                                  tr("Cut"), textedit, SLOT(cut()));
+                                  tr(":/images/cut"), textedit, SLOT(cut()));
     QAction *pasteAct = makeAction("paste.png", tr("&Paste"), tr("Ctrl+V"),
-                                  tr("Paste"), textedit, SLOT(paste()));
+                                  tr(":/images/paste"), textedit, SLOT(paste()));
     QAction *zoomInAct = makeAction("zoomin.png", tr("&ZoomIn"), QKeySequence::ZoomIn,
-                                   tr("ZoomIn"), textedit, SLOT(zoomIn()));
+                                   tr(":/images/zoomIn"), textedit, SLOT(zoomIn()));
     QAction *zoomOutAct = makeAction("zoomout.png", tr("&ZoomOut"), QKeySequence::ZoomOut,
-                                   tr("ZoomOut"), textedit, SLOT(zoomOut()));
+                                   tr(":/images/zoomOut"), textedit, SLOT(zoomOut()));
 
     /*editmenu 추가하고 editmenu아래로 그룹원들 넣어주기*/
     QMenu *editMenu = menubar->addMenu("&Edit");
@@ -64,25 +86,23 @@ QtEditor::QtEditor(QWidget *parent)
     editMenu->addAction(copyAct);
     editMenu->addAction(cutAct);
     editMenu->addAction(pasteAct);
-    editMenu->addSeparator();
+    editMenu->addSeparator(); //구분자
     editMenu->addAction(zoomInAct);
     editMenu->addAction(zoomOutAct);
 
     /*Format메뉴에 QAction들*/
-    QAction *alignCenterAct = new QAction("&Center", this);
-
+    QAction *alignCenterAct = makeAction("centeralign", tr("&Center"), QKeySequence(),
+                                         tr(":/images/centeralign.png"), this, SLOT(alignText()));
+    QAction *alignLeftAct = makeAction("leftalign", tr("&Left"), QKeySequence(),
+                                       tr(":/images/leftalign"), this, SLOT(alignText()));
+    QAction *alignRightAct = makeAction(":/images/rightalign", tr("&Right"), QKeySequence(), tr("Align Right"),
+                                        this, SLOT(alignText()));
     /*Format메뉴를 추가할게용*/
     QMenu *formatMenu = menubar->addMenu("&Format");
     QMenu *alignMenu= formatMenu->addMenu("&Align");
-    alignMenu->addAction(alignCenterAct);
-
-    /*format-aling-connect-test*/
-    //(1) connect(alignCenterAct, SIGNAL(triggered()), textedit, SLOT(setAlignment(Qt::AlignCenter)));
-    // (2) connect(alignCenterAct, SIGNAL(triggered(Qt::AlignCenter)), textedit, SLOT(setAlignment(Qt::AlignCenter)));
-    connect(alignCenterAct, &QAction::triggered, this,[=]{textedit->setAlignment(Qt::AlignCenter);});
-
-
-
+    alignMenu->addAction(alignCenterAct); // Format -> Aling -> center
+    alignMenu->addAction(alignLeftAct); //alignleft
+    alignMenu->addAction(alignRightAct); //alignright
 
 
     /*Status Bar*/
@@ -91,6 +111,8 @@ QtEditor::QtEditor(QWidget *parent)
     statusLabel->setObjectName("StatusLabel");
     statusbar->addPermanentWidget(statusLabel);
     statusbar->showMessage("started", 1500);
+
+
 
     /*Tool Bar*/
     QToolBar *fileToolBar = addToolBar("&File");
@@ -103,6 +125,7 @@ QtEditor::QtEditor(QWidget *parent)
     QMenu *windowMenu = menubar->addMenu("&Window");
     QMenu *toolbarMenu = windowMenu->addMenu("&Toolbar");
     toolbarMenu->addAction(fileToolBar->toggleViewAction());
+    toolbarMenu -> addAction(dock->toggleViewAction());  /*QDockWidget tollbarMenu*/
 
     QFontComboBox *fontComboBox = new QFontComboBox(this);
     connect(fontComboBox, SIGNAL(currentFontChanged(QFont)), textedit, SLOT(setCurrentFont(QFont)));
@@ -145,9 +168,9 @@ QAction *QtEditor::makeAction(QString icon, QString text, T shortCut,
 }
 
 
-void QtEditor::newFile(){
-    qDebug("Make New File");
-}
+// void QtEditor::newFile(){
+//     qDebug("Make New File");
+// }
 
 void QtEditor::open(){
     qDebug("Open a file");
@@ -165,16 +188,36 @@ void QtEditor::quit(){
     qDebug("quit");
 }
 
+
+QTextEdit *QtEditor::newFile(){
+    qDebug("Make New File");
+    QTextEdit *textedit = new QTextEdit;
+    mdiArea -> addSubWindow(textedit);
+    textedit->show();
+    return textedit;
+}
+
+
 /*alignText 사용자 정의 슬롯 정의구현*/
 void QtEditor::alignText(){
-    QAction *action = qobject_cast<QAction*> (sender());
+
+    /*기존 align 코드*/
+    // QAction *action = qobject_cast<QAction*> (sender());
+    // if(action->text().contains("Left", Qt::CaseInsensitive))
+    //     textedit->setAlignment(Qt::AlignLeft);
+    // else if(action->text().contains("Center", Qt::CaseInsensitive))
+    //     textedit->setAlignment(Qt::AlignCenter);
+    // else if(action->text().contains("Right", Qt::CaseInsensitive))
+    //     textedit->setAlignment(Qt::AlignRight);
+
+    QAction *action = qobject_cast<QAction*>(sender());
+    QMdiSubWindow *subWindow = mdiArea->currentSubWindow();
+    QTextEdit *textedit = dynamic_cast<QTextEdit*>(subWindow->widget());
     if(action->text().contains("Left", Qt::CaseInsensitive))
         textedit->setAlignment(Qt::AlignLeft);
     else if(action->text().contains("Center", Qt::CaseInsensitive))
         textedit->setAlignment(Qt::AlignCenter);
-
-
+      else if(action->text().contains("Right", Qt::CaseInsensitive))
+        textedit->setAlignment(Qt::AlignRight);
 }
-
-
 

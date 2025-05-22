@@ -2,8 +2,9 @@
 #define QTEDITOR_H
 
 #include <QMainWindow>
-
+class QLabel;
 class QAction;
+class QMdiArea;
 class QTextEdit;
 
 class QtEditor : public QMainWindow
@@ -24,10 +25,12 @@ private:
     QAction *makeAction(QString icon, QString text, T shortCut,
                         QString toolTip, QObject* recv, Functor lambda);
 
-    QTextEdit *textedit;
+    QMdiArea *mdiArea;
+
 
 public slots:
-    void newFile();
+    QTextEdit *newFile();
+    // void newFile();
     void open();
     void save();
     void saveAs();
