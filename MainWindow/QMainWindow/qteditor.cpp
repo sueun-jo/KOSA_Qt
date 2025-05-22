@@ -16,6 +16,8 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QColorDialog>
+#include <QPrinter>
+#include <QPrintDialog>
 
 #include "qteditor.h"
 
@@ -55,6 +57,8 @@ QtEditor::QtEditor(QWidget *parent)
                                   tr("save as a file"), this, SLOT(saveAs()));
     QAction *quitAct = makeAction (":/images/quit.png", tr("&Quit"), tr("Ctrl+Q"),
                                   tr("Quit this program"), qApp, SLOT(quit()));
+    QAction *printAct = makeAction("printiconurl", tr("&Print"), QKeySequence::Print,
+                                   tr("print a file"), this, SLOT(print()));
 
     QMenu *fileMenu = menubar->addMenu("&File"); //FileMenu추가
 
@@ -63,7 +67,9 @@ QtEditor::QtEditor(QWidget *parent)
     fileMenu->addAction(openAct);
     fileMenu->addAction(saveAct);
     fileMenu->addAction(saveAsAct);
+    fileMenu->addAction(printAct);
     fileMenu->addAction(quitAct);
+
 
     /*edit menu group aciton*/
     QAction *undoAct = makeAction(":/images/undo.png", tr("&Undo"), QKeySequence::Undo,
@@ -278,4 +284,15 @@ void QtEditor::setColor(){
     QTextEdit *textedit = (QTextEdit*)mdiArea->currentSubWindow()->widget();
     QColor color = QColorDialog::getColor(textedit->textColor(), this);
     if(color.isValid()) textedit->setTextColor(color);
+}
+
+void QtEditor::print(){
+    QPrinter printer (QPrinter::HighResolution);
+    printer.setFullPage(true);
+    QPrintDialog printDialog(&printer, this);
+    if(printDialog.exec()==QDialog::Accepted){
+        QTextEdit* textedit = (QTextEdit*)mdiArea->currentSubWindow()->widget();
+        textedit->print(&printer);
+    }
+
 }

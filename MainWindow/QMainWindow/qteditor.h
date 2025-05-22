@@ -49,6 +49,7 @@ public slots:
     void saveAsFile();
 
     void setColor();
+    void print();
 
 
 
