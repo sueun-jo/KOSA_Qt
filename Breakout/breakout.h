@@ -16,9 +16,14 @@ private:
     QLabel *ball;
     QLabel *paddle;
     QLabel *bricks[NO_OF_BRICKS];
+    int timerId;
+    int xDir, yDir;
+
 protected:
     void keyPressEvent(QKeyEvent *) override;
     void mouseMoveEvent(QMouseEvent *e) override;
+    void timerEvent(QTimerEvent*) override;
+    void moveObjects();
 
 protected:
     static const int MOVE_SPEED = 3; //패들 이동 속도

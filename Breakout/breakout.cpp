@@ -9,7 +9,7 @@
 #define SCR_HEIGHT 400
 
 Breakout::Breakout(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent), xDir(1), yDir(-1)
 {
     /* ball */
     ball = new QLabel(this);
@@ -32,6 +32,8 @@ Breakout::Breakout(QWidget *parent)
     resize(SCR_WIDTH, SCR_HEIGHT);
 
     setMouseTracking(true);
+
+    timerId = startTimer(10);
 }
 
 Breakout::~Breakout(){
@@ -40,6 +42,21 @@ Breakout::~Breakout(){
 
     for (int i=0; i < NO_OF_BRICKS; i++)
         delete bricks[i];
+}
+
+void Breakout::timerEvent(QTimerEvent *e){
+    Q_UNUSED(e);
+    moveObjects();
+}
+
+void Breakout::moveObjects(){
+    ball->move(ball->x() + xDir, ball->y() + yDir);
+
+    if ((ball->x() <= 0)|| (ball->x()+10 >=SCR_WIDTH)){ //경계검사
+        xDir *= -1;
+    }
+
+    if (ball->y() <= 0) yDir = 1;
 }
 
 void Breakout::keyPressEvent(QKeyEvent *e){
