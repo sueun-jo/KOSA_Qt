@@ -13,19 +13,19 @@ Breakout::Breakout(QWidget *parent)
     : QWidget(parent), xDir(1), yDir(-1)
 {
     /* ball */
-    ball = new QLabel(this);
+    ball = new Ball(this);
     ball->setGeometry(SCR_WIDTH*0.8, SCR_HEIGHT*0.875, 10, 10);
     ball->setStyleSheet("QLabel {background-color:CornflowerBlue; border-radius:5px;}"); //ball만들기
 
     /* paddle */
-    paddle = new QLabel(this);
+    paddle = new Paddle(this);
     paddle->setGeometry(SCR_WIDTH*0.7, SCR_HEIGHT*0.9, WIDTH, HEIGHT );
     paddle->setStyleSheet("QLabel {background-color:lightgray;}");
 
     /* bricks */
     for (int y=0, i=0; y < 5; y++)
         for (int x=0; x<6; x++, i++){
-            bricks[i] = new QLabel(this);
+            bricks[i] = new Brick(this);
             bricks[i]->setStyleSheet("QLabel {background-color:AliceBlue; border:1px solid gray}");
             bricks[i]->setGeometry(x*WIDTH, y*HEIGHT+30, WIDTH, HEIGHT);
         }
@@ -54,8 +54,6 @@ Breakout::Breakout(QWidget *parent)
     effectPlayer->setLoops(QMediaPlayer::Once);
     effectPlayer->setSource(
         QUrl::fromLocalFile(QFileInfo("effect.wav").absoluteFilePath()));
-
-
 
     timerId = startTimer(10);
 }

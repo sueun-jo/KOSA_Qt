@@ -5,6 +5,10 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <QMediaPlayer>
+#include "ball.h"
+#include "brick.h"
+#include "paddle.h"
+
 
 class QLabel;
 
@@ -14,9 +18,9 @@ class Breakout : public QWidget
 private:
     static const int NO_OF_BRICKS = 30;
 
-    QLabel *ball;
-    QLabel *paddle;
-    QLabel *bricks[NO_OF_BRICKS];
+    Ball *ball;
+    Paddle *paddle;
+    Brick *bricks[NO_OF_BRICKS];
 
     QMediaPlayer *bgPlayer;
     QMediaPlayer *effectPlayer;
