@@ -44,11 +44,74 @@ Breakout::~Breakout(){
         delete bricks[i];
 }
 
+void Breakout::checkCollision(){
+    if (ball->geometry().bottom() > height()){ //공이 아래로 가면 게임 종료
+        killTimer(timerId);
+        qDebug("Game lost");
+    }
+
+    int j=0;
+    for (int i=0; i< NO_OF_BRICKS; i++)
+        if(bricks[i]->isHidden()) j++;
+
+    if ( j == NO_OF_BRICKS ){
+        killTimer(timerId);
+        qDebug("You Win!");
+    }
+
+    /* paddle(사용자)와의 충돌 처리*/
+    if ((ball->geometry()).intersects(paddle->geometry())){ //ball이 paddle와 intersects(교집합, 즉 충돌)
+        int paddleLPos = paddle->geometry().left();
+        int ballLPos = ball->geometry().left();
+        int first = paddleLPos + 8;
+        int second = paddleLPos + 16;
+        int third = paddleLPos + 24;
+        int fourth = paddleLPos + 32;
+
+        /*paddle 맞은 부분에 따라 공의 반사되는 방향 조정*/
+        if (ballLPos<first) xDir = -1, yDir = -1;
+        if (ballLPos>=first&& ballLPos < second) xDir = -1, yDir *= -1;
+        if (ballLPos>= second && ballLPos < third) xDir=0, yDir = -1;
+        if (ballLPos>= third && ballLPos < fourth) xDir=1, yDir = -1;
+        if (ballLPos > fourth) xDir =1, yDir =-1;
+    }
+
+    /*블록 충돌 처리*/
+    for (int i=0; i < NO_OF_BRICKS; i++){
+        if ((ball->geometry()).intersects(bricks[i]->geometry())){
+            int ballLeft = ball->geometry().left();
+            int ballHeight = ball->geometry().height();
+            int ballWidth = ball->geometry().width();
+            int ballTop = ball->geometry().top();
+
+            /*현재 블록 위치 계산*/
+            QPoint pointRight (ballLeft + ballWidth + 1, ballTop);
+            QPoint pointLeft(ballLeft - 1, ballTop);
+            QPoint pointTop(ballLeft, ballTop-1);
+            QPoint pointBottom(ballLeft, ballTop+ballHeight+1);
+
+            if(!bricks[i]->isHidden()){ /*공과 블럭의 충돌 검사*/
+                if(bricks[i]->geometry().contains(pointRight)) xDir = -1;
+                else if (bricks[i]->geometry().contains(pointLeft)) xDir = 1;
+                if(bricks[i]->geometry().contains(pointTop)) yDir = 1;
+                else if (bricks[i]->geometry().contains(pointBottom)) yDir = -1;
+
+                bricks[i]->setHidden(true);
+            }
+        }
+    }
+}
+
+
+
+/*timer로 화면 그려준다*/
 void Breakout::timerEvent(QTimerEvent *e){
     Q_UNUSED(e);
     moveObjects();
+    checkCollision();
 }
 
+/*공의 움직임*/
 void Breakout::moveObjects(){
     ball->move(ball->x() + xDir, ball->y() + yDir);
 

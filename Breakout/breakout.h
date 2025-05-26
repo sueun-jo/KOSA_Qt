@@ -24,6 +24,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *e) override;
     void timerEvent(QTimerEvent*) override;
     void moveObjects();
+    void checkCollision();
 
 protected:
     static const int MOVE_SPEED = 3; //패들 이동 속도
