@@ -1,6 +1,7 @@
 #include <QLabel>
 #include <QApplication>
 #include <QErrorMessage>
+#include <QtMultimedia>
 #include "breakout.h"
 
 #define WIDTH 50
@@ -33,6 +34,29 @@ Breakout::Breakout(QWidget *parent)
 
     setMouseTracking(true);
 
+    /*사운드 출력을 위한 미디어 플레이어 초기화*/
+    QAudioOutput *bgAudioOutput = new QAudioOutput;
+    bgAudioOutput->setVolume(10);
+
+    bgPlayer = new QMediaPlayer();
+    bgPlayer->setAudioOutput(bgAudioOutput);
+    bgPlayer->setLoops(QMediaPlayer::Infinite); //무한반복
+    bgPlayer->setSource(
+        QUrl::fromLocalFile(QFileInfo("background.wav").absoluteFilePath()));
+    bgPlayer->play();
+
+    /*효과음 출력을 위한 플레이어*/
+    QAudioOutput *bgEffectOutput = new QAudioOutput;
+    bgEffectOutput->setVolume(200);
+
+    effectPlayer = new QMediaPlayer();
+    effectPlayer->setAudioOutput(bgEffectOutput);
+    effectPlayer->setLoops(QMediaPlayer::Once);
+    effectPlayer->setSource(
+        QUrl::fromLocalFile(QFileInfo("effect.wav").absoluteFilePath()));
+
+
+
     timerId = startTimer(10);
 }
 
@@ -44,6 +68,7 @@ Breakout::~Breakout(){
         delete bricks[i];
 }
 
+/*충돌 체크 함수*/
 void Breakout::checkCollision(){
     if (ball->geometry().bottom() > height()){ //공이 아래로 가면 게임 종료
         killTimer(timerId);
@@ -79,7 +104,12 @@ void Breakout::checkCollision(){
         if (ballLPos>= second && ballLPos < third) xDir=0, yDir = -1;
         if (ballLPos>= third && ballLPos < fourth) xDir=1, yDir = -1;
         if (ballLPos > fourth) xDir =1, yDir =-1;
+
+        effectPlayer->stop();
+        effectPlayer->play();
     }
+
+
 
     /*블록 충돌 처리*/
     for (int i=0; i < NO_OF_BRICKS; i++){
@@ -102,7 +132,10 @@ void Breakout::checkCollision(){
                 else if (bricks[i]->geometry().contains(pointBottom)) yDir = -1;
 
                 bricks[i]->setHidden(true);
+
             }
+            effectPlayer->stop();
+            effectPlayer->play();
         }
     }
 }

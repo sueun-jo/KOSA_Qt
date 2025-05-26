@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <QMediaPlayer>
 
 class QLabel;
 
@@ -16,6 +17,10 @@ private:
     QLabel *ball;
     QLabel *paddle;
     QLabel *bricks[NO_OF_BRICKS];
+
+    QMediaPlayer *bgPlayer;
+    QMediaPlayer *effectPlayer;
+
     int timerId;
     int xDir, yDir;
 
