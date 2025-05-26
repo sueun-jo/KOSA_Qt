@@ -1,6 +1,6 @@
 #include <QLabel>
 #include <QApplication>
-
+#include <QErrorMessage>
 #include "breakout.h"
 
 #define WIDTH 50
@@ -47,7 +47,9 @@ Breakout::~Breakout(){
 void Breakout::checkCollision(){
     if (ball->geometry().bottom() > height()){ //공이 아래로 가면 게임 종료
         killTimer(timerId);
-        qDebug("Game lost");
+
+        QErrorMessage *message = new QErrorMessage();
+        message->showMessage("you died");
     }
 
     int j=0;
@@ -56,6 +58,9 @@ void Breakout::checkCollision(){
 
     if ( j == NO_OF_BRICKS ){
         killTimer(timerId);
+
+        QErrorMessage *message = new QErrorMessage();
+        message->showMessage("you win");
         qDebug("You Win!");
     }
 
